@@ -1,0 +1,25 @@
+{
+  "name": "fightersguild-launcher",
+  "version": "1.0.1",
+  "description": "Fighters Guild modpack launcher: installs NeoForge and the modpack over an official Minecraft install, and keeps both in sync.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "vite:dev": "vite",
+    "vite:build": "vite build"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.1.0",
+    "@tauri-apps/plugin-updater": "^2.0.0",
+    "@tauri-apps/plugin-process": "^2.0.0",
+    "@tauri-apps/plugin-opener": "^2.0.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0",
+    "vite": "^5.4.0"
+  },
+  "license": "AGPL-3.0-or-later"
+}

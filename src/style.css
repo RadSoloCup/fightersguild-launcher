@@ -1,0 +1,243 @@
+/* Matches the Fighters Guild portal / Minecraft hub theme (RSI Blue):
+   deep navy surfaces, cool light text, cyan accents. */
+:root {
+  --bg-0: hsl(214, 32%, 4.4%);
+  --bg-1: hsl(213, 38%, 6.2%);
+  --bg-2: hsl(213, 34%, 9.2%);
+  --bg-3: hsl(213, 32%, 12.4%);
+  --text-0: hsl(200, 18%, 95%);
+  --text-1: hsl(202, 16%, 82%);
+  --text-2: hsl(205, 14%, 61%);
+  --text-3: hsl(206, 12%, 46%);
+  --link: hsl(189, 92%, 62%);
+  --cyan: #22d3ee;
+  --success: hsl(155, 64%, 44%);
+  --warning: hsl(38, 92%, 55%);
+  --danger: hsl(2, 74%, 58%);
+  --border: hsla(200, 55%, 62%, 0.16);
+  --border-hi: hsla(192, 85%, 62%, 0.35);
+  --font: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg-0);
+  color: var(--text-1);
+  font-family: var(--font);
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.titlebar {
+  flex-shrink: 0;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 12px;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-3);
+}
+.titlebar-label { flex: 1; }
+.titlebar-controls { display: flex; height: 100%; }
+.tb-btn {
+  width: 44px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-family: "Segoe MDL2 Assets", sans-serif;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tb-btn:hover { background: var(--bg-3); color: var(--text-0); }
+.tb-btn.tb-close:hover { background: var(--danger); color: white; }
+
+main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 28px 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background:
+    radial-gradient(ellipse 500px 260px at 50% -10%, hsla(192, 85%, 55%, 0.14), transparent 60%),
+    var(--bg-0);
+}
+
+.news-card {
+  width: 100%;
+  display: flex;
+  gap: 14px;
+  text-align: left;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.news-shot { width: 120px; flex-shrink: 0; background: var(--bg-3); }
+.news-shot img { width: 100%; height: 100%; object-fit: cover; }
+.news-body { padding: 12px 14px 12px 0; min-width: 0; }
+.news-kicker {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 4px;
+}
+.news-body h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: var(--text-0); }
+.news-body p { margin: 0 0 6px; font-size: 12px; color: var(--text-2); line-height: 1.4; }
+.news-battlepass { color: var(--text-1) !important; }
+.news-link { font-size: 12px; color: var(--link); text-decoration: none; font-weight: 600; }
+.news-link:hover { text-decoration: underline; }
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 8px;
+}
+h1 {
+  margin: 0 0 22px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-0);
+  letter-spacing: -0.01em;
+}
+
+.card {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 24px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.status-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px hsla(192, 85%, 62%, 0.7);
+  flex-shrink: 0;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.status-dot.ok { background: var(--success); box-shadow: 0 0 10px hsla(155, 64%, 44%, 0.7); animation: none; }
+.status-dot.error { background: var(--danger); box-shadow: 0 0 10px hsla(2, 74%, 58%, 0.7); animation: none; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.status-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-0);
+  text-align: left;
+}
+
+.progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--cyan), hsl(202, 78%, 55%));
+  transition: width 0.3s ease;
+}
+
+.log {
+  height: 120px;
+  overflow-y: auto;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11.5px;
+  color: var(--text-2);
+  text-align: left;
+  margin-bottom: 16px;
+}
+.log div { margin-bottom: 3px; white-space: pre-wrap; }
+.log div.error { color: var(--danger); }
+
+.actions { display: flex; justify-content: center; gap: 10px; }
+
+.btn {
+  padding: 11px 28px;
+  border-radius: 10px;
+  border: none;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-primary { background: var(--cyan); color: var(--bg-0); }
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary { background: var(--bg-3); color: var(--text-1); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--border-hi); }
+.btn-small { padding: 7px 16px; font-size: 12.5px; }
+
+.update-banner {
+  width: 100%;
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: hsla(38, 92%, 55%, 0.1);
+  border: 1px solid hsla(38, 92%, 55%, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: var(--warning);
+}
+
+footer {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-3);
+  border-top: 1px solid var(--border);
+  background: var(--bg-1);
+}
+footer a { color: var(--text-3); text-decoration: none; }
+footer a:hover { color: var(--link); }
+.dot-sep { opacity: 0.5; }
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font);
+  font-size: 11px;
+  color: var(--text-3);
+  cursor: pointer;
+}
+.link-btn:hover { color: var(--danger); }

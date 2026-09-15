@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fighters Guild Launcher</title>
+<link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+
+  <div class="titlebar" data-tauri-drag-region>
+    <span class="titlebar-label" data-tauri-drag-region>Fighters Guild</span>
+    <div class="titlebar-controls">
+      <button class="tb-btn" id="tb-minimize" title="Minimize">&#xE921;</button>
+      <button class="tb-btn" id="tb-maximize" title="Maximize">&#xE922;</button>
+      <button class="tb-btn tb-close" id="tb-close" title="Close">&#xE8BB;</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="eyebrow">Fighters Guild</div>
+    <h1>Launcher</h1>
+
+    <div class="news-card" id="news-card" hidden>
+      <div class="news-shot"><img id="news-image" src="" alt="" loading="lazy"></div>
+      <div class="news-body">
+        <span class="news-kicker">Latest Update</span>
+        <h3 id="news-title"></h3>
+        <p id="news-excerpt"></p>
+        <p class="news-battlepass" id="news-battlepass" hidden>
+          &#127875; <strong>Trick or Trainer</strong> battlepass is live: 30 levels of Pixelmon
+          rewards, running through Dec 13.
+        </p>
+        <a href="#" id="news-link" class="news-link">Read the full update &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="status-row">
+        <div class="status-dot" id="status-dot"></div>
+        <div class="status-text" id="status-text">Checking your Minecraft install...</div>
+      </div>
+
+      <div class="progress-track" id="progress-track" hidden>
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+
+      <div class="log" id="log" hidden></div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="btn-primary" hidden>Play</button>
+        <button class="btn btn-secondary" id="btn-retry" hidden>Retry</button>
+      </div>
+    </div>
+
+    <div class="update-banner" id="update-banner" hidden>
+      <span id="update-text"></span>
+      <button class="btn btn-small" id="btn-update">Update &amp; Restart</button>
+    </div>
+  </main>
+
+  <footer>
+    <span id="version-text">v1.0.0</span>
+    <span class="dot-sep">&middot;</span>
+    <a href="#" id="link-minecraft">fightersguild.playit.quest/minecraft</a>
+    <span class="dot-sep">&middot;</span>
+    <button class="link-btn" id="btn-exit">Exit</button>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
