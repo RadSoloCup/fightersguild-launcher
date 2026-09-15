@@ -1,6 +1,6 @@
 {
   "name": "fightersguild-launcher",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Fighters Guild modpack launcher: installs NeoForge and the modpack over an official Minecraft install, and keeps both in sync.",
   "private": true,
   "type": "module",

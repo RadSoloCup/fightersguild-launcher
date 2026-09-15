@@ -134,22 +134,77 @@ fn require_vanilla_installed(mc_dir: &Path) -> Result<(), String> {
 
 // Reuse the Java runtime the official launcher already downloaded, rather
 // than bundling our own.
-fn find_java(mc_dir: &Path) -> String {
-    let runtime_dir = mc_dir.join("runtime");
-    if let Ok(entries) = std::fs::read_dir(&runtime_dir) {
-        for entry in entries.flatten() {
-            let candidate = entry
-                .path()
-                .join("windows-x64")
-                .join(entry.file_name())
-                .join("bin")
-                .join("javaw.exe");
-            if candidate.exists() {
-                return candidate.to_string_lossy().to_string();
+//
+// The runtime folder layout differs by launcher install type, and on a
+// machine with no separate JDK install "java" isn't on PATH at all (most
+// players never install Java themselves — the launcher hides it), so a
+// blind fallback to the bare "java" command fails with a cryptic OS-level
+// "program not found" instead of a message anyone could act on. Search
+// every location the runtime realistically lives in, and only fall back to
+// PATH if a `java`/`javaw` executable can actually be resolved there.
+fn find_java(mc_dir: &Path) -> Option<String> {
+    // 1. The classic (.exe/MSI) launcher's own per-version runtimes.
+    if let Some(found) = search_runtime_dir(&mc_dir.join("runtime")) {
+        return Some(found);
+    }
+
+    // 2. The Microsoft Store launcher keeps its runtimes in the app's
+    //    sandboxed LocalCache instead of %APPDATA%\.minecraft.
+    if let Ok(local_appdata) = std::env::var("LOCALAPPDATA") {
+        let store_runtime = PathBuf::from(&local_appdata)
+            .join("Packages")
+            .join("Microsoft.4297127D64EC6_8wekyb3d8bbwe")
+            .join("LocalCache")
+            .join("Local")
+            .join("runtime");
+        if let Some(found) = search_runtime_dir(&store_runtime) {
+            return Some(found);
+        }
+    }
+
+    // 3. A separately-installed JDK/JRE, if the machine happens to have one.
+    if let Ok(java_home) = std::env::var("JAVA_HOME") {
+        let candidate = PathBuf::from(&java_home).join("bin").join("javaw.exe");
+        if candidate.exists() {
+            return Some(candidate.to_string_lossy().to_string());
+        }
+    }
+
+    // 4. Whatever "java"/"javaw" PATH itself resolves to, verified rather
+    //    than assumed — `where` prints nothing and exits non-zero if PATH
+    //    has no match, so this can't silently hand back a dead command.
+    for name in ["javaw", "java"] {
+        if let Ok(output) = Command::new("where").arg(name).output() {
+            if output.status.success() {
+                if let Some(first_line) = String::from_utf8_lossy(&output.stdout).lines().next() {
+                    let path = first_line.trim();
+                    if !path.is_empty() {
+                        return Some(path.to_string());
+                    }
+                }
             }
         }
     }
-    "java".to_string() // fall back to PATH
+
+    None
+}
+
+// Layout is `<runtime_dir>/<name>/windows-x64/<name>/bin/javaw.exe`, e.g.
+// `.minecraft/runtime/java-runtime-delta/windows-x64/java-runtime-delta/bin/javaw.exe`.
+fn search_runtime_dir(runtime_dir: &Path) -> Option<String> {
+    let entries = std::fs::read_dir(runtime_dir).ok()?;
+    for entry in entries.flatten() {
+        let candidate = entry
+            .path()
+            .join("windows-x64")
+            .join(entry.file_name())
+            .join("bin")
+            .join("javaw.exe");
+        if candidate.exists() {
+            return Some(candidate.to_string_lossy().to_string());
+        }
+    }
+    None
 }
 
 fn sha256_hex(bytes: &[u8]) -> String {
@@ -415,7 +470,12 @@ pub async fn run(window: tauri::Window) -> Result<(), String> {
     let mc_dir = minecraft_dir()?;
     require_vanilla_installed(&mc_dir)?;
 
-    let java_path = find_java(&mc_dir);
+    let java_path = find_java(&mc_dir).ok_or_else(|| {
+        "Could not find a Java runtime. Open the official Minecraft Launcher, go to \
+         Installations, and launch any version once (even vanilla) so it downloads Java, \
+         then try again."
+            .to_string()
+    })?;
     install_forge(&window, &mc_dir, &java_path).await?;
     sync_modpack(&window, &mc_dir).await?;
 
@@ -447,6 +507,31 @@ pub fn launch_official_launcher() -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // Real-environment check, not a mock: this machine has no
+    // .minecraft\runtime folder (confirmed separately), so this only
+    // passes if find_java's JAVA_HOME/PATH fallbacks actually work, which
+    // is exactly the scenario the reported "program not found" bug came
+    // from on a machine with no separately-installed JDK either. A missing
+    // Java on the test runner would be a real environment gap, not a
+    // reason to skip this.
+    #[test]
+    fn find_java_resolves_to_a_real_executable_on_this_machine() {
+        let mc_dir = PathBuf::from(std::env::var("APPDATA").unwrap()).join(".minecraft");
+        let resolved = find_java(&mc_dir).expect("find_java should locate some Java on this machine");
+        assert!(
+            Path::new(&resolved).exists() || which_on_path(&resolved),
+            "find_java returned {resolved:?}, which is neither a real file nor resolvable on PATH"
+        );
+    }
+
+    fn which_on_path(name: &str) -> bool {
+        Command::new("where")
+            .arg(name)
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false)
+    }
 
     #[test]
     fn rebrand_profile_renames_icons_and_bumps_lastused() {
