@@ -250,6 +250,18 @@ fn rebrand_profile(mc_dir: &Path) -> Result<(), String> {
             "icon".to_string(),
             serde_json::Value::String(format!("data:image/png;base64,{icon_b64}")),
         );
+        // NeoForge's installer doesn't set a memory override on the profile
+        // it creates, so the launcher falls back to its own global default
+        // (2 GB on a fresh account) — nowhere near enough for a 300+ mod
+        // pack, and it crashes on load without this. Always enforced, same
+        // as name/icon/lastUsed above, so it stays correct across updates
+        // even if NeoForge's installer ever changes what it writes here.
+        profile.insert(
+            "javaArgs".to_string(),
+            serde_json::Value::String(
+                "-Xmx8G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M".to_string(),
+            ),
+        );
     }
 
     let updated = serde_json::to_string_pretty(&json).map_err(|e| e.to_string())?;
@@ -479,6 +491,7 @@ mod tests {
         assert!(forge["lastUsed"].as_str().unwrap().ends_with('Z'), "lastUsed should stay in the same Zulu format Mojang uses");
         assert_ne!(forge["icon"], "data:image/png;base64,AAAA", "icon should be swapped to the embedded crossed-swords PNG");
         assert!(forge["icon"].as_str().unwrap().starts_with("data:image/png;base64,"));
+        assert!(forge["javaArgs"].as_str().unwrap().contains("-Xmx8G"), "should set 8GB max heap, NeoForge's installer leaves this unset which falls back to the launcher's 2GB default and crashes");
 
         // The unrelated profile must be left completely untouched.
         assert_eq!(updated["profiles"]["unrelated"]["name"], "some other profile");
